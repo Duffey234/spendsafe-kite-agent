@@ -1,0 +1,24 @@
+{
+  "name": "spendsafe-kite-agent",
+  "version": "0.1.0",
+  "description": "SpendSafe Kite Agent \u2014 SERV Hackathon 02 (Kite). Live: SERV Reasoning decide, PayGuard preview, Base USDC x402+Settlement Check (0.005). Simulated until passkey: Kite Passport session execute. Local pay helper simulated.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "demo": "tsx scripts/demo.ts",
+    "smoke-serv": "tsx scripts/smoke-serv.ts",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "secret-scan": "bash scripts/secret-scan.sh"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "20.19.0",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

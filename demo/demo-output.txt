@@ -1,0 +1,152 @@
+SpendSafe Kite Agent — SERV Hackathon 02 (Kite track)
+Paced demo. Watch live vs simulated labels carefully.
+
+SERV_API_KEY: present → live decide calls enabled (cheapest model gpt-6-luna)
+
+════════════════════════════════════════════════════════════════════════
+1/5  Session envelope (Passport-style — SIMULATED identity until passkey)
+════════════════════════════════════════════════════════════════════════
+
+▸ session
+{
+  "agentId": "kite-sim-agent-5d640257a05fe38460f1399b",
+  "identityLabel": "SIMULATED Kite Passport agent id — not registered on live Passport; for hackathon demo / tests",
+  "sessionId": "sess_simulated_mw9l21u7_q0izwn",
+  "sessionLabel": "SIMULATED spending session — not a live Kite Passport approval",
+  "maxPerTxUsdc": "0.01",
+  "maxTotalUsdc": "0.05",
+  "spentUsdc": "0",
+  "expiresAt": "2026-11-09T18:46:48.079Z",
+  "status": "active",
+  "mode": "simulated"
+}
+
+Note: Kite Passport signup prepared; human passkey approval still required.
+
+════════════════════════════════════════════════════════════════════════
+2/5  SERV Reasoning LIVE — approve a clean in-limit proposal
+════════════════════════════════════════════════════════════════════════
+
+▸ proposal
+{
+  "payTo": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "amountAtomic": "1000",
+  "amountUsdc": "0.001",
+  "resource": "https://api.youraitools.co/payguard/v1/preview",
+  "reason": "Pre-screen USDC contract via PayGuard before a catalog buy",
+  "network": "kite-simulated"
+}
+
+▸ verdict.decision
+{
+  "action": "approve",
+  "explanation": "The amount is within the per-transaction and session limits.",
+  "source": "serv-live",
+  "model": "gpt-6-luna"
+}
+
+▸ verdict.payguard
+{
+  "address": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "sanctioned": false,
+  "matchCount": 0,
+  "source": "payguard-live-preview",
+  "detail": "clear on preview tier"
+}
+
+▸ receipt (local helper = simulated)
+{
+  "success": true,
+  "simulated": true,
+  "transaction": "0xsimd08db91a7720a6cd11e60d6ec2ede6bd5d15e35a1685266fb745493c0d0a",
+  "network": "kite-simulated",
+  "amountAtomic": "1000",
+  "payTo": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "resource": "https://api.youraitools.co/payguard/v1/preview",
+  "settledAt": "2026-11-09T18:17:06.068Z",
+  "settleCheck": {
+    "status": "simulated-pass",
+    "note": "SIMULATED Settlement Check — live settle-check runner not invoked ($0)."
+  }
+}
+
+OK: SERV source = serv-live
+
+════════════════════════════════════════════════════════════════════════
+3/5  PayGuard LIVE preview — clean vs SDN sample
+════════════════════════════════════════════════════════════════════════
+
+▸ PayGuard clean
+{
+  "address": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "sanctioned": false,
+  "matchCount": 0,
+  "source": "payguard-live-preview",
+  "detail": "clear on preview tier"
+}
+
+▸ PayGuard SDN sample
+{
+  "address": "0x098b716b8aaf21512996dc57eb0615e2383e2f96",
+  "sanctioned": true,
+  "matchCount": 1,
+  "source": "payguard-live-preview",
+  "detail": "OFAC SDN match (preview tier)"
+}
+
+════════════════════════════════════════════════════════════════════════
+4/5  Fail-closed refuses (SDN + over-limit)
+════════════════════════════════════════════════════════════════════════
+
+▸ SDN refuse
+{
+  "ok": false,
+  "reasons": [
+    "PayGuard sanctioned (1 match)"
+  ],
+  "payguard": {
+    "address": "0x098b716b8aaf21512996dc57eb0615e2383e2f96",
+    "sanctioned": true,
+    "matchCount": 1,
+    "source": "payguard-live-preview",
+    "detail": "OFAC SDN match (preview tier)"
+  },
+  "receipt": null
+}
+
+▸ Over-limit refuse
+{
+  "ok": false,
+  "reasons": [
+    "per-tx limit exceeded: 1 > 0.01 USDC",
+    "session total exceeded: spent 0.001 + 1 > 0.05 USDC",
+    "SERV refuse: Per-tx cap is 0.01 USDC; proposal is 1."
+  ],
+  "receipt": null
+}
+
+════════════════════════════════════════════════════════════════════════
+5/5  LIVE on-chain x402 + Settlement Check (Base USDC 0.005)
+════════════════════════════════════════════════════════════════════════
+
+▸ live Settlement Check
+{
+  "status": "pass",
+  "amount_usdc": "0.005",
+  "payer": "0xE35E10429048b6F3409b0307E65e4797477Ed144",
+  "payTo": "0x3c1a1e01e790cd326495631b3b38bd7068f08d6f",
+  "transaction": "0x7da2e7c99f8ef9e589e75adbf84f511b3e8e4816772c3a3225990890a857552d",
+  "basescan_tx": "https://basescan.org/tx/0x7da2e7c99f8ef9e589e75adbf84f511b3e8e4816772c3a3225990890a857552d",
+  "ref": "SERV4248089"
+}
+
+Basescan: https://basescan.org/tx/0x7da2e7c99f8ef9e589e75adbf84f511b3e8e4816772c3a3225990890a857552d
+
+════════════════════════════════════════════════════════════════════════
+Done
+════════════════════════════════════════════════════════════════════════
+Live: SERV decide · PayGuard preview · Base x402+Settlement Check ($0.005)
+Pending human: Kite Passport passkey → session execute
+Local executeX402Payment helper: simulated (labelled on receipt)
+Track: Kite · SERV Hackathon 02
+⠙[1G[0K
